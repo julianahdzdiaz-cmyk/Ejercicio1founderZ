@@ -5,4 +5,7 @@ Herramientas
 - Ipad
 - Vs code web hytps://vscode.web
 - Github 
+Estado:
+Github creado
+Vs code web abierto y conectado con github
 
