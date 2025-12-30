@@ -14,11 +14,14 @@
       body {
         background: white;
       }
+      .no-print {
+        display: none;
+      }
       button {
         display: none;
       }
-      .no-print {
-        display: none;
+      table {
+        page-break-inside: avoid;
       }
     }
   </style>
@@ -32,15 +35,21 @@
 
     <!-- BOTONES -->
     <div class="flex flex-wrap gap-3 justify-center mb-6 no-print">
-      <button onclick="generateKetoMenu()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl shadow hover:bg-emerald-700">
+      <button
+        onclick="generateKetoMenu()"
+        class="bg-emerald-600 text-white px-4 py-2 rounded-xl shadow hover:bg-emerald-700">
         🎲 Sugerencias Keto
       </button>
 
-      <button onclick="clearTable()" class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600">
+      <button
+        onclick="clearTable()"
+        class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600">
         🧹 Limpiar todo
       </button>
 
-      <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700">
+      <button
+        onclick="window.print()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700">
         🖨️ Imprimir
       </button>
     </div>
@@ -72,6 +81,7 @@
   </div>
 
   <script>
+    /* ====== DATOS ====== */
     const days = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
     const meals = ["Desayuno","Almuerzo","Cena"];
 
@@ -97,64 +107,81 @@
     };
 
     const tableBody = document.getElementById("menuTable");
-function createTable() {
-  tableBody.innerHTML = "";
-  meals.forEach(meal => {
-    const row = document.createElement("tr");
-    row.setAttribute("data-meal", meal);
-
-    row.innerHTML = `<td class="bg-gray-100 font-semibold p-2">${meal}</td>`;
-
-    days.forEach(() => {
-      const cell = document.createElement("td");
-      cell.contentEditable = true;
-      cell.className = "p-2 border text-sm focus:outline-none";
-      cell.addEventListener("input", updateShoppingList);
-      row.appendChild(cell);
-    });
-
-    tableBody.appendChild(row);
-  });
-}
-
-
     const shoppingListDiv = document.getElementById("shoppingList");
 
+    /* ====== TABLA ====== */
+    function createTable() {
+      tableBody.innerHTML = "";
 
+      meals.forEach(meal => {
+        const row = document.createElement("tr");
+        row.dataset.meal = meal;
 
+        const labelCell = document.createElement("td");
+        labelCell.className = "bg-gray-100 font-semibold p-2";
+        labelCell.innerText = meal;
+        row.appendChild(labelCell);
+
+        days.forEach(() => {
+          const cell = document.createElement("td");
+          cell.contentEditable = true;
+          cell.className = "p-2 border text-sm focus:outline-none";
+          cell.addEventListener("input", updateShoppingList);
+          row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    /* ====== UTILIDADES ====== */
     function randomItem(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-function generateKetoMenu() {
+    /* ====== BOTÓN SUGERENCIAS ====== */
+    function generateKetoMenu() {
       [...tableBody.rows].forEach(row => {
-        const meal = row.cells[0].innerText.trim();
+        const meal = row.dataset.meal;
+        const dishes = ketoDishes[meal];
+
+        if (!Array.isArray(dishes)) return;
+
         for (let i = 1; i < row.cells.length; i++) {
-          row.cells[i].innerText = randomItem(ketoDishes[meal]);
+          row.cells[i].innerText = randomItem(dishes);
         }
       });
-      updateShoppingList();
-        }
 
+      updateShoppingList();
+    }
+
+    /* ====== LIMPIAR ====== */
     function clearTable() {
-      [...tableBody.querySelectorAll("td")].forEach((cell, index) => {
-        if (index % 8 !== 0) cell.innerText = "";
+      [...tableBody.rows].forEach(row => {
+        for (let i = 1; i < row.cells.length; i++) {
+          row.cells[i].innerText = "";
+        }
       });
       shoppingListDiv.innerHTML = "";
     }
 
+    /* ====== LISTA DE COMPRA ====== */
     function updateShoppingList() {
       const items = new Set();
 
-      [...tableBody.querySelectorAll("td")].forEach((cell, index) => {
-        if (index % 8 !== 0 && cell.innerText.trim()) {
-          cell.innerText.split("+").forEach(part => {
+      [...tableBody.rows].forEach(row => {
+        for (let i = 1; i < row.cells.length; i++) {
+          const value = row.cells[i].innerText.trim();
+          if (!value) continue;
+
+          value.split("+").forEach(part => {
             items.add(part.trim());
           });
         }
       });
 
       shoppingListDiv.innerHTML = "";
+
       items.forEach(item => {
         const label = document.createElement("label");
         label.className = "flex items-center gap-2";
@@ -166,6 +193,7 @@ function generateKetoMenu() {
       });
     }
 
+    /* ====== INIT ====== */
     createTable();
   </script>
 
