@@ -97,23 +97,30 @@
     };
 
     const tableBody = document.getElementById("menuTable");
+function createTable() {
+  tableBody.innerHTML = "";
+  meals.forEach(meal => {
+    const row = document.createElement("tr");
+    row.setAttribute("data-meal", meal);
+
+    row.innerHTML = `<td class="bg-gray-100 font-semibold p-2">${meal}</td>`;
+
+    days.forEach(() => {
+      const cell = document.createElement("td");
+      cell.contentEditable = true;
+      cell.className = "p-2 border text-sm focus:outline-none";
+      cell.addEventListener("input", updateShoppingList);
+      row.appendChild(cell);
+    });
+
+    tableBody.appendChild(row);
+  });
+}
+
+
     const shoppingListDiv = document.getElementById("shoppingList");
 
-    function createTable() {
-      tableBody.innerHTML = "";
-      meals.forEach(meal => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td class="bg-gray-100 font-semibold p-2">${meal}</td>`;
-        days.forEach(() => {
-          const cell = document.createElement("td");
-          cell.contentEditable = true;
-          cell.className = "p-2 border text-sm focus:outline-none";
-          cell.addEventListener("input", updateShoppingList);
-          row.appendChild(cell);
-        });
-        tableBody.appendChild(row);
-      });
-    }
+
 
     function randomItem(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
