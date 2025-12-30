@@ -121,7 +121,7 @@
 
     function generateKetoMenu() {
       [...tableBody.rows].forEach(row => {
-        const meal = row.cells[0].innerText;
+        const meal = row.cells[0].innerText.trim();
         for (let i = 1; i < row.cells.length; i++) {
           row.cells[i].innerText = randomItem(ketoDishes[meal]);
         }
