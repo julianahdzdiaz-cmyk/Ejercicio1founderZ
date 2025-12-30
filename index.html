@@ -5,24 +5,43 @@
   <title>🥑 Menú Semanal Keto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Estilos solo para impresión -->
+  <style>
+    @media print {
+      body {
+        background: white;
+      }
+      button {
+        display: none;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen p-4">
 
   <div class="max-w-7xl mx-auto">
     <h1 class="text-3xl font-bold text-center mb-2">🥑 Menú Semanal Keto</h1>
-    <p class="text-center text-gray-600 mb-6">Planea tu semana de forma simple y deliciosa</p>
+    <p class="text-center text-gray-600 mb-6">Planea tu semana de forma simple</p>
 
     <!-- BOTONES -->
-    <div class="flex flex-wrap gap-3 justify-center mb-6">
-      <button onclick="generateKetoMenu()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl shadow hover:bg-emerald-700 transition">
+    <div class="flex flex-wrap gap-3 justify-center mb-6 no-print">
+      <button onclick="generateKetoMenu()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl shadow hover:bg-emerald-700">
         🎲 Sugerencias Keto
       </button>
 
-      <button onclick="clearTable()" class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition">
+      <button onclick="clearTable()" class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600">
         🧹 Limpiar todo
+      </button>
+
+      <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700">
+        🖨️ Imprimir
       </button>
     </div>
 
@@ -41,51 +60,46 @@
             <th class="p-2">Domingo</th>
           </tr>
         </thead>
-        <tbody id="menuTable">
-          <!-- Filas generadas por JS -->
-        </tbody>
+        <tbody id="menuTable"></tbody>
       </table>
     </div>
 
     <!-- LISTA DE COMPRAS -->
     <div class="bg-white rounded-xl shadow p-4">
-      <h2 class="text-xl font-semibold mb-2">🛒 Lista de la compra</h2>
-      <textarea id="shoppingList" class="w-full h-40 p-3 border rounded-lg focus:outline-none focus:ring focus:ring-emerald-300"
-        placeholder="Aquí aparecerán los ingredientes según los platos..."></textarea>
+      <h2 class="text-xl font-semibold mb-3">🛒 Lista de la compra</h2>
+      <div id="shoppingList" class="space-y-2"></div>
     </div>
   </div>
 
   <script>
-    const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-    const meals = ["Desayuno", "Almuerzo", "Cena"];
+    const days = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+    const meals = ["Desayuno","Almuerzo","Cena"];
 
     const ketoDishes = {
       Desayuno: [
         "🥚 Huevos con aguacate",
-        "🧀 Omelette de queso y espinaca",
+        "🧀 Omelette de queso",
         "🥓 Tocino con huevos",
-        "🥥 Yogur griego con nueces",
-        "🍳 Huevos revueltos con mantequilla"
+        "🥥 Yogur griego con nueces"
       ],
       Almuerzo: [
-        "🥗 Ensalada César keto",
-        "🍗 Pollo a la plancha con brócoli",
-        "🥩 Carne salteada con vegetales",
-        "🐟 Salmón con mantequilla",
-        "🥑 Ensalada de atún y aguacate"
+        "🍗 Pollo a la plancha + 🥦 Brócoli",
+        "🥩 Carne salteada + 🥑 Aguacate",
+        "🐟 Salmón + 🥬 Ensalada verde",
+        "🍔 Hamburguesa keto + 🍄 Champiñones"
       ],
       Cena: [
-        "🍖 Costillas al horno",
-        "🍄 Champiñones rellenos",
-        "🥩 Bistec con espárragos",
-        "🍗 Pollo al curry keto",
-        "🐟 Pescado al limón"
+        "🍖 Costillas al horno + 🥗 Ensalada",
+        "🍗 Pollo al curry keto + 🥦 Coliflor",
+        "🥩 Bistec + 🥬 Espárragos",
+        "🐟 Pescado al limón + 🥑 Aguacate"
       ]
     };
 
     const tableBody = document.getElementById("menuTable");
+    const shoppingListDiv = document.getElementById("shoppingList");
 
-    function createTable() {
+    function createTable() {urst
       tableBody.innerHTML = "";
       meals.forEach(meal => {
         const row = document.createElement("tr");
@@ -119,17 +133,30 @@
       [...tableBody.querySelectorAll("td")].forEach((cell, index) => {
         if (index % 8 !== 0) cell.innerText = "";
       });
-      document.getElementById("shoppingList").value = "";
+      shoppingListDiv.innerHTML = "";
     }
 
     function updateShoppingList() {
       const items = new Set();
+
       [...tableBody.querySelectorAll("td")].forEach((cell, index) => {
         if (index % 8 !== 0 && cell.innerText.trim()) {
-          items.add("• " + cell.innerText);
+          cell.innerText.split("+").forEach(part => {
+            items.add(part.trim());
+          });
         }
       });
-      document.getElementById("shoppingList").value = [...items].join("\n");
+
+      shoppingListDiv.innerHTML = "";
+      items.forEach(item => {
+        const label = document.createElement("label");
+        label.className = "flex items-center gap-2";
+        label.innerHTML = `
+          <input type="checkbox" class="w-4 h-4">
+          <span>${item}</span>
+        `;
+        shoppingListDiv.appendChild(label);
+      });
     }
 
     createTable();
