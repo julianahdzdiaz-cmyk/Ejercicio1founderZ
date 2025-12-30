@@ -119,7 +119,7 @@
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function generateKetoMenu() {
+function generateKetoMenu() {
       [...tableBody.rows].forEach(row => {
         const meal = row.cells[0].innerText.trim();
         for (let i = 1; i < row.cells.length; i++) {
@@ -127,7 +127,7 @@
         }
       });
       updateShoppingList();
-    }
+        }
 
     function clearTable() {
       [...tableBody.querySelectorAll("td")].forEach((cell, index) => {
