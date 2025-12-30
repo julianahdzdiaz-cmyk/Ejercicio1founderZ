@@ -10,20 +10,33 @@
 
   <!-- Estilos solo para impresión -->
   <style>
-    @media print {
-      body {
-        background: white;
-      }
-      .no-print {
-        display: none;
-      }
-      button {
-        display: none;
-      }
-      table {
-        page-break-inside: avoid;
-      }
-    }
+   @media print {
+  body {
+    background: white;
+  }
+
+  .no-print,
+  button {
+    display: none !important;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+
+  /* 🔥 FORZAR 2 COLUMNAS EN iOS */
+  #shoppingList {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+  }
+
+  .shopping-category {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
   </style>
 </head>
 
